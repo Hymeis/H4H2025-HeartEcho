@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from back_end.db.models import Like
+from back_end.models import Like
 
 like_bp = Blueprint('like', __name__)
 

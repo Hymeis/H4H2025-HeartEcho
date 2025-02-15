@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from back_end.db.models import Comment
+from back_end.models import Comment
 
 comment_bp = Blueprint('comment', __name__)
 
