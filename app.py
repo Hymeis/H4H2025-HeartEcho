@@ -18,13 +18,11 @@ def create_app():
     from routes.post import post_bp
     from routes.comment import comment_bp
     from routes.like import like_bp
-    from routes.tag import tag_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(post_bp, url_prefix='/posts')
     app.register_blueprint(comment_bp, url_prefix='/comments')
     app.register_blueprint(like_bp, url_prefix='/likes')
-    app.register_blueprint(tag_bp, url_prefix='/tags')
 
     return app
 
