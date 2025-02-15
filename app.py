@@ -24,10 +24,6 @@ def create_app():
     app.register_blueprint(post_bp, url_prefix='/posts')
     app.register_blueprint(comment_bp, url_prefix='/comments')
     app.register_blueprint(like_bp, url_prefix='/likes')
-    app.register_blueprint(tag_bp, url_prefix='/tags')
-    app.register_blueprint(chat_bp, url_prefix='/chat')
-    app.register_blueprint(user_bp, url_prefix='/users')
-    app.register_blueprint(task_bp, url_prefix='/tasks')
 
 
     return app
