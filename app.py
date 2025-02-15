@@ -18,10 +18,6 @@ def create_app():
     from routes.post import post_bp
     from routes.comment import comment_bp
     from routes.like import like_bp
-    from routes.tag import tag_bp # assuming you will create tag_bp in routes/tag.py
-    from routes.chat import chat_bp # assuming you will create chat_bp in routes/chat.py
-    from routes.user import user_bp # assuming you will create user_bp in routes/user.py
-    from routes.task import task_bp # assuming you will create task_bp in routes/task.py
 
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
