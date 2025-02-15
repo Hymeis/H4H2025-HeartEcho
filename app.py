@@ -14,10 +14,10 @@ def create_app():
     login_manager.init_app(app)
 
     # Register Blueprints
-    from routes.auth import auth_bp
-    from routes.post import post_bp
-    from routes.comment import comment_bp
-    from routes.like import like_bp
+    from back_end.routes.auth import auth_bp
+    from back_end.routes.post import post_bp
+    from back_end.routes.comment import comment_bp
+    from back_end.routes.like import like_bp
 
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
