@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import LoadingScreen from '@/components/LoadingScreen'; 
 import './globals.css';
 import Providers from './providers';
+import NavBar from './homepage/_components/NavBar';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
