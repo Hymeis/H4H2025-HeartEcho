@@ -1,8 +1,7 @@
-// app/chat/page.tsx
 'use client';
 
 import { useState } from 'react';
-import NavBar from '../homepage/_components/NavBar';
+import { useSession } from 'next-auth/react';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -10,29 +9,35 @@ interface ChatMessage {
 }
 
 export default function ChatPage() {
+  const { data: session } = useSession();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Send user message + user_id to the backend
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
-    // 1. Add the user's message to the conversation immediately
+    // 1. Add user message to local state
     const userMsg: ChatMessage = { role: 'user', content: input.trim() };
     setMessages((prev) => [...prev, userMsg]);
 
-    // 2. Clear the input field
+    // 2. Clear input
     setInput('');
     setIsLoading(true);
 
     try {
-      // 3. Post to the specialized ChatGPT endpoint
-      const res = await fetch('http://localhost:5000/chat', {
+      // 3. Send to the specialized endpoint, including user_id
+      const userId = session?.user?.uid || 'anonymous';
+      const res = await fetch('http://localhost:5000/chat/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMsg.content }),
+        body: JSON.stringify({
+          user_id: userId, 
+          user_input: userMsg.content,
+        }),
       });
 
       if (!res.ok) {
@@ -40,16 +45,17 @@ export default function ChatPage() {
       }
 
       const data = await res.json();
+      // The backend should return { response: "...some text..." }
       const assistantMsg: ChatMessage = {
         role: 'assistant',
         content: data.response || 'No response found',
       };
 
-      // 4. Append the assistant's message
+      // 4. Append the assistant message
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err) {
       console.error(err);
-      // Optionally show an error message in the chat
+      // Optionally show an error response
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: 'Error: failed to get response.' },
@@ -59,7 +65,7 @@ export default function ChatPage() {
     }
   };
 
-  // Pressing Enter in the input
+  // Press Enter to send
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -69,11 +75,9 @@ export default function ChatPage() {
 
   return (
     <div className="bg-black min-h-screen text-white flex flex-col">
-        <NavBar />
       <div className="flex-1 max-w-3xl w-full mx-auto p-4 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-4">Heart Echo Chat</h1>
-
-        {/* Chat Messages */}
+        {/* Render the messages */}
         <div className="space-y-4">
           {messages.map((msg, idx) => (
             <div
@@ -96,7 +100,7 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Chat Input */}
+      {/* Input area */}
       <div className="border-t border-gray-700 p-4">
         <div className="flex items-center gap-2 max-w-3xl mx-auto">
           <input
