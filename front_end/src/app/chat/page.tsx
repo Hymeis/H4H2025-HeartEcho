@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import NavBar from '../homepage/_components/NavBar';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -75,6 +76,7 @@ export default function ChatPage() {
 
   return (
     <div className="bg-black min-h-screen text-white flex flex-col">
+      <NavBar />
       <div className="flex-1 max-w-3xl w-full mx-auto p-4 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-4">Heart Echo Chat</h1>
         {/* Render the messages */}
