@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import NavBar from '../homepage/_components/NavBar';
+import NavBar from '../homepage/_components/NavBar'; // adjust path if needed
+import WritePost from '../homepage/_components/WritePost';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -15,14 +16,24 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Send user message + user_id to the backend
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleAddPostClick = () => {
+    setModalOpen(true);
+  };
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+  const handlePostCreated = () => {
+    setModalOpen(false);
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim()) return;
-
     // 1. Add user message to local state
     const userMsg: ChatMessage = { role: 'user', content: input.trim() };
     setMessages((prev) => [...prev, userMsg]);
-
     // 2. Clear input
     setInput('');
     setIsLoading(true);
@@ -40,23 +51,19 @@ export default function ChatPage() {
           user_input: userMsg.content,
         }),
       });
-
       if (!res.ok) {
         throw new Error(`Error from server: ${res.status} ${res.statusText}`);
       }
-
       const data = await res.json();
       // The backend should return { response: "...some text..." }
       const assistantMsg: ChatMessage = {
         role: 'assistant',
         content: data.response || 'No response found',
       };
-
       // 4. Append the assistant message
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err) {
       console.error(err);
-      // Optionally show an error response
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: 'Error: failed to get response.' },
@@ -66,7 +73,6 @@ export default function ChatPage() {
     }
   };
 
-  // Press Enter to send
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -76,7 +82,7 @@ export default function ChatPage() {
 
   return (
     <div className="bg-black min-h-screen text-white flex flex-col">
-      <NavBar />
+      <NavBar onAddPostClick={handleAddPostClick} />
       <div className="flex-1 max-w-3xl w-full mx-auto p-4 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-4">Heart Echo Chat</h1>
         {/* Render the messages */}
@@ -123,6 +129,26 @@ export default function ChatPage() {
           </button>
         </div>
       </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={closeModal}
+          />
+          <div className="relative bg-white text-black p-6 rounded shadow-lg w-full max-w-2xl mx-auto">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+              onClick={closeModal}
+            >
+              Close ✕
+            </button>
+            <WritePost
+              userId={session?.user?.uid || 'unknown'}
+              onPostCreated={handlePostCreated}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

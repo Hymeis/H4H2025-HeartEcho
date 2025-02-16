@@ -18,7 +18,7 @@ export default function NavBar({ onAddPostClick }: NavBarProps) {
 
   return (
     <nav className="flex items-center justify-between bg-black py-4 px-6 shadow">
-      <div className="text-xl font-bold text-white">Heart Echo</div>
+      <Link href="/homepage" className="text-xl font-bold text-white">Heart Echo</Link>
 
       <div className="flex items-center space-x-6">
         {/* Add link to /chat */}
