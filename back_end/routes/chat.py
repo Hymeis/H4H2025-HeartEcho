@@ -1,9 +1,11 @@
 from flask import request, jsonify, session, Blueprint
 from openai import OpenAI
+import os
 
-
+#TODO setup environment key------------------------------------------------------
+key = os.getenv("OPENAI_API_KEY")
 # Initialize the OpenAI client
-client = OpenAI(api_key="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")
+client = OpenAI(api_key=key)
 
 # Store chat history per user
 user_sessions = {}

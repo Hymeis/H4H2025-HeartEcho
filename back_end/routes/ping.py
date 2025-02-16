@@ -1,8 +1,8 @@
 import os
 from openai import OpenAI
 
-# Initialize the OpenAI client
-client = OpenAI(api_key="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")
+key = "YOUR KEY"
+client = OpenAI(api_key=key)
 
 #print("OpenAI library version:", openai.__version__)
 
