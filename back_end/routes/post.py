@@ -1,11 +1,13 @@
 from flask import Blueprint, request, jsonify
-from app import db
 from back_end.models import Post
+from back_end.database import Session
+
 
 post_bp = Blueprint('post', __name__)
 
 @post_bp.route('/', methods=['POST'])
 def create_post():
+    session = Session()
     data = request.json
     if not data or 'user_id' not in data or 'title' not in data or 'content' not in data or 'tag' not in data or 'user_nickname' not in data:
         return jsonify({'message': 'Missing required data'}), 400
@@ -16,8 +18,8 @@ def create_post():
         tag=data['tag'],
         user_nickname=data['user_nickname']
     )
-    db.session.add(post)
-    db.session.commit()
+    session.add(post)
+    session.commit()
     return jsonify({'message': 'Post created successfully', 'post_id': post.pid}), 201
 
 @post_bp.route('/', methods=['GET'])
@@ -54,7 +56,7 @@ def edit_post(pid):
     post.tag = data['tag']
     post.user_nickname = data['user_nickname']
 
-    db.session.commit()
+    Session.commit()
     return jsonify({'message': 'Post updated successfully', 'post_id': post.pid}), 200
 
 @post_bp.route('/<int:pid>', methods=['DELETE'])
@@ -63,6 +65,6 @@ def delete_post(pid):
     if not post:
         return jsonify({'message': 'Post not found'}), 404
 
-    db.session.delete(post)
-    db.session.commit()
+    Session.delete(post)
+    Session.commit()
     return jsonify({'message': 'Post deleted successfully', 'post_id': pid}), 200

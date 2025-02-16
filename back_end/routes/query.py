@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app import db
 from back_end.models import Post  # Import the Post model
+
+
 
 query_bp = Blueprint('query', __name__)
 

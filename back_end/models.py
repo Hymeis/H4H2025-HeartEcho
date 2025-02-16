@@ -1,39 +1,64 @@
-from app import db
-from flask_login import UserMixin
+from sqlalchemy import Column, Integer, String, Text, DateTime, JSON, ForeignKey
+from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.ext.declarative import declared_attr
 from datetime import datetime
+from flask_login import UserMixin
+from base import Base
 
 
-class User(db.Model, UserMixin):
-    uid = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    post_list = db.Column(db.JSON, default=[])  # List of post IDs created by the user
-    like_list = db.Column(db.JSON, default=[])  # List of liked post IDs
+class User(Base, UserMixin):
+    __tablename__ = 'users'
 
-    posts = db.relationship("Post", backref="author", lazy=True)
-    comments = db.relationship("Comment", backref="commenter", lazy=True)
+    uid = Column(Integer, primary_key=True)
+    email = Column(String(120), unique=True, nullable=False)
+    post_list = Column(JSON, default=list)  # Use default=list instead of default=[]
+    like_list = Column(JSON, default=list)
 
-class Post(db.Model):
-    pid = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.uid"), nullable=False)
-    title = db.Column(db.String(120), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    tag = db.Column(db.String(50), nullable=False)  # Category for the post
-    user_nickname = db.Column(db.String(120), nullable=False)  # Random or user-defined nickname
-    likes = db.Column(db.Integer, default=0)  # Number of likes
-    comment_list = db.Column(db.JSON, default=[])  # List of comment IDs
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    # Relationships
+    posts = relationship("Post", back_populates="author")
+    comments = relationship("Comment", back_populates="commenter")
 
-    comments = db.relationship("Comment", backref="post", lazy=True)
+    # Required for Flask-Login
+    def get_id(self):
+        return str(self.uid)
 
-class Comment(db.Model):
-    cid = db.Column(db.Integer, primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey("post.pid"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.uid"), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    likes = db.Column(db.Integer, default=0)  # Number of likes
-    comment_from = db.Column(db.Integer, default=-1)  # -1 for direct post comments, else CID of parent comment
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-class Tag(db.Model):
-    tid = db.Column(db.Integer, primary_key=True)
-    category = db.Column(db.String(50), unique=True, nullable=False)  # Defined categories
+class Post(Base):
+    __tablename__ = 'posts'
+
+    pid = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.uid'), nullable=False)
+    title = Column(String(120), nullable=False)
+    content = Column(Text, nullable=False)
+    tag = Column(String(50), nullable=False)
+    user_nickname = Column(String(120), nullable=False)
+    likes = Column(Integer, default=0)
+    comment_list = Column(JSON, default=list)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    author = relationship("User", back_populates="posts")
+    comments = relationship("Comment", back_populates="post")
+
+
+class Comment(Base):
+    __tablename__ = 'comments'
+
+    cid = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.pid'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.uid'), nullable=False)
+    content = Column(Text, nullable=False)
+    likes = Column(Integer, default=0)
+    comment_from = Column(Integer, default=-1)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    commenter = relationship("User", back_populates="comments")
+    post = relationship("Post", back_populates="comments")
+
+
+class Tag(Base):
+    __tablename__ = 'tags'
+
+    tid = Column(Integer, primary_key=True)
+    category = Column(String(50), unique=True, nullable=False)

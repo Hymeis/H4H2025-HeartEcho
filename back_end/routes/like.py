@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app import db
 from back_end.models import User, Post  # Import User and Post models
+from back_end.database import Session
+
 
 like_bp = Blueprint('like', __name__)
 
@@ -27,7 +28,7 @@ def like_post():
     user.like_list.append(post_id)
     post.likes += 1
 
-    db.session.commit()
+    Session.commit()
     return jsonify({'message': 'Post liked successfully'}), 200
 
 @like_bp.route('/cancel_like', methods=['POST'])
@@ -50,7 +51,7 @@ def cancel_like():
     if post_id in user.like_list:
         user.like_list.remove(post_id)
         post.likes -= 1
-        db.session.commit()
+        Session.commit()
         return jsonify({'message': 'Like removed successfully'}), 200
     else:
         return jsonify({'message': 'Like not found for this user and post'}), 404

@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app import db
 from back_end.models import Comment
+from back_end.database import Session
+
 
 comment_bp = Blueprint('comment', __name__)
 
@@ -10,8 +11,8 @@ def add_comment():
     if not data or 'post_id' not in data or 'user_id' not in data or 'content' not in data:
         return jsonify({'message': 'Missing data'}), 400
     comment = Comment(post_id=data['post_id'], user_id=data['user_id'], content=data['content'])
-    db.session.add(comment)
-    db.session.commit()
+    Session.add(comment)
+    Session.commit()
     return jsonify({'message': 'Comment added successfully', 'comment_id': comment.cid}), 201
 
 @comment_bp.route('/<int:cid>', methods=['PUT'])
@@ -25,7 +26,7 @@ def edit_comment(cid):
         return jsonify({'message': 'Comment not found'}), 404
 
     comment.content = data['content']
-    db.session.commit()
+    Session.commit()
     return jsonify({'message': 'Comment updated successfully', 'comment_id': comment.cid}), 200
 
 @comment_bp.route('/<int:cid>', methods=['DELETE'])
@@ -34,6 +35,6 @@ def delete_comment(cid):
     if not comment:
         return jsonify({'message': 'Comment not found'}), 404
 
-    db.session.delete(comment)
-    db.session.commit()
+    Session.delete(comment)
+    Session.commit()
     return jsonify({'message': 'Comment deleted successfully', 'comment_id': cid}), 200
