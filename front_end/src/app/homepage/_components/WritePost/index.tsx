@@ -17,9 +17,9 @@ export default function WritePost({ onPostCreated, userId }: WritePostProps) {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
-
+    const userId = localStorage.getItem('uid');
     try {
-      const response = await fetch('/posts', {
+      const response = await fetch('http://localhost:5000/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -33,6 +33,7 @@ export default function WritePost({ onPostCreated, userId }: WritePostProps) {
         throw new Error(`Failed to submit post. Code: ${response.status}`);
       }
       const data = await response.json();
+      
       console.log('Post created:', data);
 
       // Clear fields

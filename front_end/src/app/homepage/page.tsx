@@ -44,7 +44,7 @@ export default function Homepage() {
   // ==========================
   async function fetchLatestPosts() {
     try {
-      const res = await fetch('/posts/by_time', {
+      const res = await fetch('http://localhost:5000/posts/by_time', {
         method: 'GET',
       });
       if (!res.ok) {
