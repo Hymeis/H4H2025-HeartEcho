@@ -28,7 +28,7 @@ def generate_pseudo_random_string(length=10, seed=None):
 @post_bp.route('/', methods=['POST'])
 def create_post():
     data = request.json
-    if not data or 'user_id' not in data or 'title' not in data or 'content' not in data or 'tag' not in data not in data:
+    if not data or 'user_id' not in data or 'title' not in data or 'content' not in data or 'tag' not in data:
         return jsonify({'message': 'Missing required data'}), 400
 
     post = Post(
