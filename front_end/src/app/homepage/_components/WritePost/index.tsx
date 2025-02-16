@@ -19,7 +19,7 @@ export default function WritePost({ onPostCreated, userId }: WritePostProps) {
     setIsSubmitting(true);
     const userId = localStorage.getItem('uid');
     try {
-      const response = await fetch('http://localhost:5000/posts', {
+      const response = await fetch('http://localhost:5000/posts/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
